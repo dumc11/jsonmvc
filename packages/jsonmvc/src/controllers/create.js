@@ -10,22 +10,24 @@ import * as most from 'most'
 
 import libGet from './../fns/lib-get'
 import libOn from './../fns/lib-on'
+import libPatch from './../fns/lib-patch'
 
 const lib = db => {
   return {
     get: libGet(db),
-    on: libOn(db)
+    on: libOn(db),
+    patch: libPatch(db)
   }
 }
 
-function buildObservable (source, lib, ops) {
+function buildObservable(source, lib, ops) {
   ops.forEach(x => {
     let op = x[0]
     let args = x[1]
     args = Array.prototype.slice.call(args)
     if (isFunction(args[0])) {
       let fn = args[0]
-      args[0] = function controllerWrapperFn () {
+      args[0] = function controllerWrapperFn() {
         let fnArgs = Array.prototype.slice.call(arguments)
         fnArgs.push(lib)
         return fn.apply(null, fnArgs)
@@ -37,8 +39,8 @@ function buildObservable (source, lib, ops) {
   return source
 }
 
-function createController (db, controller, name) {
-  let off = () => {}
+function createController(db, controller, name) {
+  let off = () => { }
 
   if (!controller.args || !controller.fn) {
     throw new Error(`Controller [${name}] should look like:
