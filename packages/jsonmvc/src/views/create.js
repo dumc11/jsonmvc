@@ -80,7 +80,7 @@ function createView(db, view, siblings) {
   // Find all required props
   props.required = Object.keys(view.args).reduce((acc, x) => {
     view.args[x].replace(PROP_REGEX, (a, b, c, d) => {
-      if (acc.indexOf(b) === -1 && !view.args[b]) {
+      if (acc.indexOf(b) === -1 && !view.args[b] && b !== 'viewPath' && b !== 'viewId') {
         acc.push(b)
       }
     })
@@ -199,6 +199,9 @@ function createView(db, view, siblings) {
         viewId: id,
         viewPath: rootPath
       }
+
+      self.viewId = id
+      self.viewPath = rootPath
 
       const localProps = {}
       Object.keys(view.args).forEach(x => {
