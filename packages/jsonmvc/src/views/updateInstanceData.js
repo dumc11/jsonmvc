@@ -2,7 +2,7 @@
 import getPath from './getPath'
 import createDataListener from './createDataListener'
 
-function updateInstanceData (db, schema, props, data, self, prop, val) {
+function updateInstanceData(db, schema, props, data, self, prop, val) {
 
   function parseToken(token) {
     // Unsubscribe all listeners for this prop
@@ -18,7 +18,7 @@ function updateInstanceData (db, schema, props, data, self, prop, val) {
         let path = getPath(schema, props, self, x)
 
         self.paths[x] = path
-        let listener = createDataListener(db, path, data, x)
+        let listener = createDataListener(db, path, data, x, self.__JSONMVC_ROOT)
         props.schema.subscribes[token].push(listener)
 
         if (props.schema.tokens[x]) {

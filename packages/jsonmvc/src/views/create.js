@@ -10,7 +10,7 @@ import guid from 'jsonmvc-helper-guid'
 
 const PROP_REGEX = /<([a-zA-Z0-9]+)>/g
 
-function createView (db, view, siblings) {
+function createView(db, view, siblings) {
   let observer
   let observable = new Observable(_observer => {
     observer = _observer
@@ -122,10 +122,10 @@ function createView (db, view, siblings) {
 
     return acc
   }, {
-    paths: {},
-    tokens: {},
-    subscribes: {}
-  })
+      paths: {},
+      tokens: {},
+      subscribes: {}
+    })
 
   // Watch for changes on the instance properties
   props.watchers = props.required.reduce((acc, x) => {
@@ -157,7 +157,7 @@ function createView (db, view, siblings) {
     let select = false
     view.args[x].replace(PROP_REGEX, (a, b, c, d) => {
       if (view.args[b]) {
-        select = true 
+        select = true
       }
     })
     if (select) {
@@ -178,6 +178,14 @@ function createView (db, view, siblings) {
         value: true
       })
     },
+    created: function () {
+      observer.next({
+        op: 'merge',
+        path: `${this.__JSONMVC_ROOT}/props`,
+        value: this._props
+      })
+
+    },
     beforeCreate: function () {
       let self = this
       let id = guid()
@@ -187,8 +195,18 @@ function createView (db, view, siblings) {
       self.__JSONMVC_PROPS = JSON.parse(JSON.stringify(props))
       self.__JSONMVC_ROOT = rootPath
       self.__JSONMVC_DATA = {
-        viewid: id
+        viewid: id,
+        viewId: id,
+        viewPath: rootPath
       }
+
+      const localProps = {}
+      Object.keys(view.args).forEach(x => {
+        localProps[x] = null
+      })
+      props.required.forEach(x => {
+        localProps[x] = null
+      })
 
       component.instance = self
 
@@ -196,7 +214,10 @@ function createView (db, view, siblings) {
         op: 'add',
         path: rootPath,
         value: {
-          viewid: id
+          viewid: id,
+          viewId: id,
+          viewPath: rootPath,
+          props: localProps
         }
       })
     },
@@ -230,7 +251,7 @@ function createView (db, view, siblings) {
         let path = getPath(view.args, props, self, x)
         self.paths[x] = path
 
-        let listener = createDataListener(db, path, data, x)
+        let listener = createDataListener(db, path, data, x, self.__JSONMVC_ROOT)
 
         props.schema.paths[view.args[x]].forEach(y => {
           props.schema.subscribes[y].push(listener)

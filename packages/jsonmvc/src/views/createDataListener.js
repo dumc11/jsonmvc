@@ -1,5 +1,5 @@
 
-function createDataListener (db, path, data, prop) {
+function createDataListener(db, path, data, prop, rootPath) {
   // @TODO: Remove when db.on returns also undefined values
   let v = db.get(path)
   if (undefined !== v) {
@@ -16,6 +16,7 @@ function createDataListener (db, path, data, prop) {
       v = JSON.parse(JSON.stringify(v))
     }
     data[prop] = v
+    db.patch([{ op: 'merge', path: rootPath + '/props', value: data }])
   })
 }
 
